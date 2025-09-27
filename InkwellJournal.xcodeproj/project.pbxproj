@@ -27,12 +27,14 @@
 		C0D12B312E87557F008CC648 /* InkwellJournal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InkwellJournal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0D12B422E875580008CC648 /* InkwellJournalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkwellJournalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0D12B4C2E875580008CC648 /* InkwellJournalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkwellJournalUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0D12B682E8776FA008CC648 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		C0D12B542E875580008CC648 /* Exceptions for "InkwellJournal" folder in "InkwellJournal" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.gitignore,
 				Info.plist,
 			);
 			target = C0D12B302E87557F008CC648 /* InkwellJournal */;
@@ -92,6 +94,7 @@
 				C0D12B452E875580008CC648 /* InkwellJournalTests */,
 				C0D12B4F2E875580008CC648 /* InkwellJournalUITests */,
 				C0D12B322E87557F008CC648 /* Products */,
+				C0D12B682E8776FA008CC648 /* Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -292,8 +295,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3X3F6UJ44H;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = InkwellJournal/Info.plist;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "$(SRCROOT)/InkwellJournal/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Inkwell Journal";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -326,8 +331,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3X3F6UJ44H;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = InkwellJournal/Info.plist;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "$(SRCROOT)/InkwellJournal/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Inkwell Journal";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

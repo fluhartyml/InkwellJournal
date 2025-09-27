@@ -2,7 +2,7 @@
 //  InkwellJournalUITestsLaunchTests.swift
 //  InkwellJournalUITests
 //
-//  Created by Michael Fluharty on 9/26/25.
+//  Created by MLF on 9/26/25
 //
 
 import XCTest
@@ -31,3 +31,4 @@ final class InkwellJournalUITestsLaunchTests: XCTestCase {
         add(attachment)
     }
 }
+

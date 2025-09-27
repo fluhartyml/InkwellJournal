@@ -66,7 +66,6 @@ struct ContentView_iOS: View {
 
     @State private var showingNewEntry = false
     @State private var selectedEntry: JournalEntry?
-    @State private var showingStorageInfo = false
 
     var body: some View {
         NavigationStack {
@@ -104,12 +103,6 @@ struct ContentView_iOS: View {
             }
             .navigationTitle("My Journal")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { showingStorageInfo = true }) {
-                        Image(systemName: "info.circle")
-                            .font(.title3)
-                    }
-                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingNewEntry = true }) {
                         Image(systemName: "plus")
@@ -117,7 +110,7 @@ struct ContentView_iOS: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingNewEntry) {
+            .fullScreenCover(isPresented: $showingNewEntry) {
                 NewEntryView()
             }
             .sheet(isPresented: Binding(
@@ -128,11 +121,6 @@ struct ContentView_iOS: View {
                     EntryDetailView(entry: entry)
                 }
             }
-            .alert("Sync Information", isPresented: $showingStorageInfo) {
-                Button("OK") { }
-            } message: {
-                Text(syncInfoText)
-            }
         }
     }
 
@@ -142,14 +130,6 @@ struct ContentView_iOS: View {
             modelContext.delete(entry)
         }
         try? modelContext.save()
-    }
-
-    private var syncInfoText: String {
-        """
-        Storage: SwiftData + CloudKit (Private Database)
-        Entries on device: \(entries.count)
-        Note: iCloud sync depends on the user being signed in to iCloud and network availability.
-        """
     }
 }
 
@@ -416,7 +396,13 @@ struct NewEntryView: View {
                                 .padding(8)
                             }
                         } else {
-                            Button(action: { showingPhotoOptions = true }) {
+                            Button(action: {
+#if targetEnvironment(simulator)
+                                showingImagePicker = true
+#else
+                                showingPhotoOptions = true
+#endif
+                            }) {
                                 VStack(spacing: 12) {
                                     Image(systemName: "camera.fill")
                                         .font(.title)
@@ -485,21 +471,21 @@ struct NewEntryView: View {
                 }
             }
             .confirmationDialog("Add Photo", isPresented: $showingPhotoOptions) {
-                Button("Take Selfie") {
-                    ensureCameraAvailableAndAuthorized { ok in
-                        if ok { cameraPosition = .front; showingCamera = true }
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    Button("Take Selfie") {
+                        ensureCameraAvailableAndAuthorized { ok in
+                            if ok { cameraPosition = .front; showingCamera = true }
+                        }
                     }
-                }
-                Button("Take Photo") {
-                    ensureCameraAvailableAndAuthorized { ok in
-                        if ok { cameraPosition = .back; showingCamera = true }
+                    Button("Take Photo") {
+                        ensureCameraAvailableAndAuthorized { ok in
+                            if ok { cameraPosition = .back; showingCamera = true }
+                        }
                     }
                 }
 #if canImport(VisionKit)
-                Button("Scan Document") {
-                    if VNDocumentCameraViewController.isSupported {
-                        showingDocumentScanner = true
-                    }
+                if VNDocumentCameraViewController.isSupported {
+                    Button("Scan Document") { showingDocumentScanner = true }
                 }
 #endif
                 Button("Choose from Library") { showingImagePicker = true }

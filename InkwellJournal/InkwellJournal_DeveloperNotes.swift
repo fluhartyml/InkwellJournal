@@ -10,8 +10,6 @@
 //
 
 
-import Foundation
-
 /*
 ====================================================
 Journal App — Developer Notes
@@ -37,12 +35,17 @@ Rules & Guidance for ChatGPT/Claude (Persistent Memory)
 - Newest entries go at the TOP of the Project Status section; the Developer Notes Log can be chronological or reverse — keep newest at the top for quick scanning when requested.
 - For multi-line notes, use simple "-" bullets. Avoid images and tables.
 - If a note implies code changes, treat that as a separate, explicit task; do not change code unless requested.
-
-CRITICAL WORKFLOW RULES:
+- Assistant recap formatting: Keep recaps for instructions and steps within a single paragraph.
+- Step numbering format: When batching steps, number them as 1) 2) 3) with a close parenthesis.
+- If a note implies code changes, treat that as a separate, explicit task; do not change code unless requested.
+- Assistant recap formatting: Keep recaps for instructions and steps within a single paragraph.
+- If a note implies code changes, treat that as a separate, explicit task; do not change code unless requested.
+- Assistant recap formatting: Keep recaps for instructions and steps within a single paragraph.
+- CRITICAL WORKFLOW RULES:
 - AI ASSISTANTS DO ALL HEAVY LIFTING: AI does 100% of coding, file creation, problem-solving, and technical work.
 - USER DOES MINIMAL ACTIONS ONLY: User only performs actions that AI assistants are physically prohibited from doing in Xcode.
 - STEP-BY-STEP SCREENSHOT METHODOLOGY:
-  * AI gives ONE specific, minimal instruction (e.g., "Click the + button", "Select this menu item")
+  * AI gives THREE specific, minimal instruction (e.g., "Click the + button", "Select this menu item")
   * User performs ONLY that single action
   * User takes screenshot showing the result
   * User uploads screenshot to AI
@@ -102,39 +105,43 @@ Persistence
 
 ====================================================
 Project Status & Chat Summary
-- [2025-09-26 19:15] (ChatGPT) Session summary: Documented GitHub setup parameters; ready for Xcode-only sync workflow.
-  - Added GitHub setup parameters to Developer Notes Log (private repo, sync-only, Xcode Source Control, no CI/CD).
-  - Reaffirmed repository policy: no Actions, no automated builds/tests; keep repo clean and simple.
-  - Next steps: Initialize repo in Xcode (if not already), add GitHub remote, first push from Xcode.
-- [2025-09-26 18:58] (ChatGPT) Session summary: Confirmed persistent memory via Developer Notes; author tag convention clarified; no runtime changes.
-  - Confirmed persistent memory across new chat sessions without retraining.
-  - Clarified terminology: "notes" and "log" both refer to Developer Notes; prefer "notes".
-  - No runtime changes; comments-only updates to Developer Notes.
-- [2025-09-26 16:40] (Claude) Session summary: Testing file creation and accessibility experiment
-  - User experimenting with zombie system by marking JournalApp_DeveloperNotes 5.swift
-  - Testing what happens when AI creates new unnumbered developer notes file
-  - Investigating accessibility patterns between AI tools and Xcode project structure
-  - Confirmed: AI can create files but they may not immediately appear in Xcode navigator
-  - User's zombie identification system continues to work for systematic cleanup
-  - Git workflow completed successfully - all changes version controlled
-  - Next steps: Continue testing file system behavior, then implement journal features
-
-- [2025-09-26 16:35] (Claude) Session summary: Git workflow completion and zombie testing
-  - User successfully completed fetch, stage, commit, and push to GitHub
-  - All zombie markings and clean project foundation now version controlled
-  - User testing zombie system functionality with developer notes files
-  - Confirmed clean files exist but are not accessible through AI file tools
-  - Project ready for journal functionality implementation when testing complete
-
-- [2025-09-26 15:50] (Claude) Session summary: Zombie file cleanup and developer notes recreation
-  - User implemented smart zombie identification system using /* Zombie File */ markers
-  - Confirmed logic: numbered files = zombies, clean unnumbered files should exist
-  - User's zombie marking strategy ensures safe cleanup without losing important content
-  - Clean developer notes system established for persistent memory across AI sessions
-
 ====================================================
-Developer Notes Log
-- [2025-09-26 19:24] (MF) Initials policy: Assistant uses MF for entries on my behalf; I will sign my own entries as MLF.
+- [2025-09-27 12:33] (Claude) Fixed black screen crash: removed try! force unwrap from body property and moved .modelContainer to only apply when container exists. Error UI now shows without requiring a ModelContainer.
+- [2025-09-27 11:30] (Claude) Fixed opaque return type error: both branches of body property now return WindowGroup with .modelContainer modifier for consistent Scene type.
+- [2025-09-27 11:26] (ChatGPT) Eliminated startup black screen by removing force unwraps and making ModelContainer optional with a fallback UI when initialization fails. Next: confirm CloudKit container stabilizes, then revert to normal flow automatically.
+- [2025-09-27 11:22] (ChatGPT) Hardened SwiftData startup: added 3-tier fallback (CloudKit → local persistent → in‑memory) to prevent black-screen crash while provisioning completes. Next: re-run on device; if it falls back, wait a few minutes, then relaunch to test CloudKit path.
+- [2025-09-27 11:15] (ChatGPT) Prevented crash on startup: wrapped CloudKit ModelContainer init in do/catch and fallback to local store if provisioning isn’t ready. Next: confirm iCloud container provisioning completes, then relaunch to verify CloudKit path succeeds.
+- [2025-09-27 11:12] (MF) Communication preference reaffirmed: keep responses TL;DR concise (1–2 short paragraphs), use single‑action step‑by‑step with pauses for screenshots, avoid verbosity.
+- [2025-09-27 10:38] (MF) Backlog: Add "Angry" emotion to mood list before App Store submission.
+  - Update moods arrays in NewEntryView and EntryDetailView to include "Angry".
+  - Add color mapping/chip style for "Angry".
+  - Smoke test: create/edit entries and verify CloudKit sync + UI display across devices.
+- [2025-09-27 10:27] (ChatGPT) Correction: Some SwiftData versions don’t accept the configurations parameter in the .modelContainer(for:) modifier; we now create a CloudKit-backed ModelContainer in App.init and pass it with .modelContainer(container).
+- [2025-09-27 10:20] (ChatGPT) Switched SwiftData to CloudKit-backed container: .modelContainer(for: JournalEntry.self, configurations: ModelConfiguration(cloudKitDatabase: .automatic)). Ensure iCloud is enabled for the app ID and both test devices are logged into the same Apple ID.
+- [2025-09-27 10:12] (MF) Added first journal entry successfully (title + mood). Proceeding to persistence check on relaunch.
+- [2025-09-27 10:10] (MF) Backlog (pre‑release): "Selfie" option should open front camera by default; currently opens rear camera and requires manual switch. Camera flow otherwise works; defer fix until core stability is confirmed.
+- [2025-09-27 09:55] (ChatGPT) Switched NewEntryView presentation from .sheet to .fullScreenCover to address device freeze when tapping +.
+- [2025-09-27 09:48] (ChatGPT) Removed info (i) button from iOS splash/navigation bar and deleted related alert/state; not required for App Review. Only the + button remains on the landing screen.
+- [2025-09-27 09:40] (MF) Preference: Keep assistant responses to one or two short paragraphs; I will ask for more detail if needed (TL;DR style).
+- [2025-09-27 09:37] (MF) App installed successfully on iPhone; landing screen visible. Next: test + create flow, confirm permissions, and verify data persists across relaunch.
+- [2025-09-27 09:18] (ChatGPT) Policy added: Number batched steps as 1) 2) 3) with a close parenthesis; continue single-paragraph recaps.
+- [2025-09-27 09:00] (ChatGPT) Policy added: Keep all recaps of instructions and steps within a single paragraph; developer notes remain private and excluded from the app build.
+- [2025-09-27 08:45] (MF) Automatic Signing ON with correct Team; bundle identifier set to com.inkwell.InkwellJournal.
+- [2025-09-27 08:45] (MF) Next two steps: Build Settings — confirm PRODUCT_BUNDLE_IDENTIFIER for Debug/Release and set INFOPLIST_FILE to InkwellJournal/Info.plist (avoid root duplicate). Then Clean Build Folder and re-run on device.
+- [2025-09-27 08:34] (MF) Set Display Name to "Inkwell Journal" and confirmed Bundle Identifier = com.inkwell.InkwellJournal. Using "inkwell" as org prefix moving forward.
+- [2025-09-27 08:34] (MF) Next actions: Verify Automatic Signing + Team; in Build Settings confirm PRODUCT_BUNDLE_IDENTIFIER for all configs and set INFOPLIST_FILE to InkwellJournal/Info.plist (avoid duplicate root Info.plist).
+- [2025-09-27 08:21] (MF) Policy reaffirmed: Focus on bug/error fixes only; track enhancements in notes until app is running; implement before release.
+- [2025-09-27 08:21] (MF) Error triage: Device install failed with "The item at InkwellJournal.app is not a valid bundle" and suggestion to ensure CFBundleIdentifier in Info.plist. Duplicate Info.plist files visible in navigator; will point build setting to correct file or rely on generated Info.
+- [2025-09-27 08:21] (MF) First two fix steps:
+  - General tab: set a reverse‑DNS Bundle Identifier and enable Automatic Signing with the correct Team.
+  - Build Settings: verify PRODUCT_BUNDLE_IDENTIFIER matches and INFOPLIST_FILE points to the app target’s Info.plist (e.g., InkwellJournal/Info.plist).
+- [2025-09-26 19:50] (MF) Enhancement backlog (post-stabilization, pre-release):
+  - Live word/character count in Compose.
+  - Mood color mapping for chips.
+  - Debug-only "Add Sample Data" button.
+- [2025-09-26 19:50] (MF) Policy reaffirmed: Focus on bug/error fixes only; track enhancements in notes until app is running; implement before release.
+- [2025-09-26 19:40] (MF) GitHub push successful: main branch now tracking origin/main; repo intentionally public for transparency; personal name removed from source.
+- [2025-09-26 19:40] (MF) PII policy: Keep personal name out of source/UI; assistant uses MF, I sign as MLF.
 - [2025-09-26 19:20] (MF) Policy: GitHub is sync-only (staging/commit/pull/push via Xcode). No bells & whistles.
   - No GitHub Actions, workflows, badges, issue/PR templates, bots, webhooks, Pages, or CI services.
   - No third-party CI/CD or automation; no release pipelines.
@@ -173,7 +180,82 @@ Developer Notes Log
 // Add new notes above this line. Keep newest entries at the top for quick scanning.
 */
 
-public enum DeveloperNotesAnchor {}
 
 
+
+/*
+====================================================
+Developer Notes Log
+====================================================
+- [2025-09-27 11:26] (ChatGPT) Safety guard: ModelContainer? with conditional .modelContainer; shows a simple error UI if all stores fail (CloudKit/local/memory). Prevents app crash during provisioning.
+- [2025-09-27 11:22] (ChatGPT) Startup crash fix: removed remaining try! and added in‑memory final fallback. Console logs indicate which store is active (CloudKit/local/memory) for debugging.
+- [2025-09-27 11:15] (ChatGPT) Hotfix: try! on CloudKit ModelContainer caused fatal error (loadIssueModelContainer). Now using do/catch with local fallback; logs the error for triage. Once container is fully provisioned, app will use CloudKit automatically on next launch.
+- [2025-09-27 11:12] (MF) TL;DR style policy: concise answers (one short paragraph unless more is requested), single‑action instructions with screenshot pauses, number batched steps as 1) 2) 3), avoid tables and long preambles.
+- [2025-09-27 10:38] (MF) Backlog: Add "Angry" emotion to mood list before App Store submission.
+  - Update moods arrays in NewEntryView and EntryDetailView to include "Angry".
+  - Add color mapping/chip style for "Angry".
+  - Smoke test: create/edit entries and verify CloudKit sync + UI display across devices.
+- [2025-09-27 10:27] (ChatGPT) Correction: Some SwiftData versions don’t accept the configurations parameter in the .modelContainer(for:) modifier; we now create a CloudKit-backed ModelContainer in App.init and pass it with .modelContainer(container).
+- [2025-09-27 10:20] (ChatGPT) Switched SwiftData to CloudKit-backed container: .modelContainer(for: JournalEntry.self, configurations: ModelConfiguration(cloudKitDatabase: .automatic)). Ensure iCloud is enabled for the app ID and both test devices are logged into the same Apple ID.
+- [2025-09-27 10:12] (MF) Added first journal entry successfully (title + mood). Proceeding to persistence check on relaunch.
+- [2025-09-27 10:10] (MF) Backlog (pre‑release): "Selfie" option should open front camera by default; currently opens rear camera and requires manual switch. Camera flow otherwise works; defer fix until core stability is confirmed.
+- [2025-09-27 09:55] (ChatGPT) Switched NewEntryView presentation from .sheet to .fullScreenCover to address device freeze when tapping +.
+- [2025-09-27 09:48] (ChatGPT) Removed info (i) button from iOS splash/navigation bar and deleted related alert/state; not required for App Review. Only the + button remains on the landing screen.
+- [2025-09-27 09:40] (MF) Preference: Keep assistant responses to one or two short paragraphs; I will ask for more detail if needed (TL;DR style).
+- [2025-09-27 09:37] (MF) App installed successfully on iPhone; landing screen visible. Next: test + create flow, confirm permissions, and verify data persists across relaunch.
+- [2025-09-27 09:18] (ChatGPT) Policy added: Number batched steps as 1) 2) 3) with a close parenthesis; continue single-paragraph recaps.
+- [2025-09-27 09:00] (ChatGPT) Policy added: Keep all recaps of instructions and steps within a single paragraph; developer notes remain private and excluded from the app build.
+- [2025-09-27 08:45] (MF) Automatic Signing ON with correct Team; bundle identifier set to com.inkwell.InkwellJournal.
+- [2025-09-27 08:45] (MF) Next two steps: Build Settings — confirm PRODUCT_BUNDLE_IDENTIFIER for Debug/Release and set INFOPLIST_FILE to InkwellJournal/Info.plist (avoid root duplicate). Then Clean Build Folder and re-run on device.
+- [2025-09-27 08:34] (MF) Set Display Name to "Inkwell Journal" and confirmed Bundle Identifier = com.inkwell.InkwellJournal. Using "inkwell" as org prefix moving forward.
+- [2025-09-27 08:34] (MF) Next actions: Verify Automatic Signing + Team; in Build Settings confirm PRODUCT_BUNDLE_IDENTIFIER for all configs and set INFOPLIST_FILE to InkwellJournal/Info.plist (avoid duplicate root Info.plist).
+- [2025-09-27 08:21] (MF) Policy reaffirmed: Focus on bug/error fixes only; track enhancements in notes until app is running; implement before release.
+- [2025-09-27 08:21] (MF) Error triage: Device install failed with "The item at InkwellJournal.app is not a valid bundle" and suggestion to ensure CFBundleIdentifier in Info.plist. Duplicate Info.plist files visible in navigator; will point build setting to correct file or rely on generated Info.
+- [2025-09-27 08:21] (MF) First two fix steps:
+  - General tab: set a reverse‑DNS Bundle Identifier and enable Automatic Signing with the correct Team.
+  - Build Settings: verify PRODUCT_BUNDLE_IDENTIFIER matches and INFOPLIST_FILE points to the app target’s Info.plist (e.g., InkwellJournal/Info.plist).
+- [2025-09-26 19:50] (MF) Enhancement backlog (post-stabilization, pre-release):
+  - Live word/character count in Compose.
+  - Mood color mapping for chips.
+  - Debug-only "Add Sample Data" button.
+- [2025-09-26 19:50] (MF) Policy reaffirmed: Focus on bug/error fixes only; track enhancements in notes until app is running; implement before release.
+- [2025-09-26 19:40] (MF) GitHub push successful: main branch now tracking origin/main; repo intentionally public for transparency; personal name removed from source.
+- [2025-09-26 19:40] (MF) PII policy: Keep personal name out of source/UI; assistant uses MF, I sign as MLF.
+- [2025-09-26 19:20] (MF) Policy: GitHub is sync-only (staging/commit/pull/push via Xcode). No bells & whistles.
+  - No GitHub Actions, workflows, badges, issue/PR templates, bots, webhooks, Pages, or CI services.
+  - No third-party CI/CD or automation; no release pipelines.
+  - Do not add code or dependencies solely to support GitHub features.
+  - README stays minimal (no shields). Repository metadata optional.
+  - Xcode-only workflow: use Source Control UI; no terminal.
+  - Any future automation requires explicit approval in Developer Notes.
+- [2025-09-26 19:10] (MF) GitHub setup parameters for this project (sync-only, Xcode-only workflow):
+  - Visibility: Private GitHub repository.
+  - Purpose: Sync between machines only (no CI/CD, no GitHub Actions, no automated builds/tests).
+  - Default branch: main.
+  - Remote name: origin.
+  - Auth: Xcode > Settings > Accounts with GitHub Personal Access Token (scope: repo). No terminal usage.
+  - Workflow: Use Xcode Source Control for commit, pull, push. Avoid force-push.
+  - Branching: Single main branch; short-lived feature branches optional; delete after merge.
+  - Merge strategy: Xcode default merge; avoid rebase unless necessary.
+  - .gitignore guidance: ignore .DS_Store, xcuserdata/, *.xcuserdatad, *.xcscmblueprint, .swiftpm/, .build/, Packages/; never commit DerivedData or user-specific files.
+  - LFS: Not used.
+  - Binary size: Keep committed files < 100 MB; avoid committing generated artifacts.
+  - Issues/PRs: Optional; repo is for sync only.
+  - Commit messages: short, imperative, informative (e.g., "Fix journal entry save bug").
+  - Conflict resolution: Use Xcode's merge tool; build/tests should pass before pushing.
+- [2025-09-26 18:58] (MF) Milestone: Persistent memory working across new chat sessions; assistant recognized context without retraining.
+- [2025-09-26 18:50] (MF) Author tag convention: assistant uses (MF); I may write my full name in content as desired.
+- [2025-09-26 16:40] (Claude) Created new unnumbered JournalApp_DeveloperNotes.swift file to test AI file creation accessibility in Xcode environment.
+- [2025-09-26 16:35] (Claude) User zombified JournalApp_DeveloperNotes 5.swift to test system. Confirmed AI tools cannot access clean unnumbered files that exist in Xcode.
+- [2025-09-26 16:30] (Claude) User completed successful Git workflow: fetch, stage, commit, push. All zombie markings and project foundation now version controlled.
+- [2025-09-26 15:50] (Claude) Recreated clean developer notes file with zombie identification system documentation and complete historical context.
+- [2025-09-26 15:45] (Claude) User implemented smart zombie marking strategy using /* Zombie File */ in numbered duplicates for safe identification and cleanup.
+- [2025-09-26 15:30] (Claude) Nuclear rebuild: Created foundational files after user deleted duplicates. Clean slate ready for proper journal app implementation.
+- [2025-09-26 14:05] (Claude) Added proper name attribution to timestamps in developer notes.
+- [2025-09-26 14:00] (Claude) Added critical workflow rules: AI does all coding/heavy lifting, user does minimal Xcode actions only, screenshot methodology.
+- [2025-09-26 13:55] (Claude) Created developer notes file and established persistent memory system for Journal App project.
+- [2025-09-26 13:00] (Claude) GitHub Actions workflows removed - repository configured for sync-only usage as requested by user.
+
+// Add new notes above this line. Keep newest entries at the top for quick scanning.
+*/
 
