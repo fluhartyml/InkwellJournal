@@ -2,7 +2,7 @@
 //  Item.swift
 //  InkwellJournal
 //
-//  Created by Michael Fluharty on 9/26/25.
+//  Created by MLF on 9/26/25
 //
 
 import Foundation
@@ -16,3 +16,4 @@ final class Item {
         self.timestamp = timestamp
     }
 }
+

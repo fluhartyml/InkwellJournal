@@ -2,7 +2,7 @@
 //  InkwellJournalTests.swift
 //  InkwellJournalTests
 //
-//  Created by Michael Fluharty on 9/26/25.
+//  Created by MLF on 9/26/25
 //
 
 import Testing
@@ -15,3 +15,4 @@ struct InkwellJournalTests {
     }
 
 }
+

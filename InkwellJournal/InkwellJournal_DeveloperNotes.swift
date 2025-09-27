@@ -1,4 +1,4 @@
-// 2025 SEP 26 - 1833 - InkwellJournal_Developer Notes (Michael Fluharty)
+// 2025 SEP 26 - 1833 - InkwellJournal_Developer Notes (MLF)
 //  InkellJournal_DeveloperNotes.swift
 //  Inkwell Journal
 //
@@ -33,7 +33,7 @@ Rules & Guidance for ChatGPT/Claude (Persistent Memory)
 - Do NOT write logs to any runtime-accessible file. Only append comments inside this file.
 - Do NOT wire this file into the app at runtime (do not import/read/parse it from app code).
 - Append new entries under the section "Developer Notes Log" using this format:
-  [YYYY-MM-DD HH:MM] (AUTHOR) Message. Use MF for Michael Fluharty; use Claude for Claude entries; use ChatGPT for ChatGPT entries.
+  [YYYY-MM-DD HH:MM] (AUTHOR) Message. Assistant uses MF when writing on behalf of the user; the user may sign as MLF. Use Claude for Claude entries; use ChatGPT for ChatGPT entries.
 - Newest entries go at the TOP of the Project Status section; the Developer Notes Log can be chronological or reverse — keep newest at the top for quick scanning when requested.
 - For multi-line notes, use simple "-" bullets. Avoid images and tables.
 - If a note implies code changes, treat that as a separate, explicit task; do not change code unless requested.
@@ -134,6 +134,7 @@ Project Status & Chat Summary
 
 ====================================================
 Developer Notes Log
+- [2025-09-26 19:24] (MF) Initials policy: Assistant uses MF for entries on my behalf; I will sign my own entries as MLF.
 - [2025-09-26 19:20] (MF) Policy: GitHub is sync-only (staging/commit/pull/push via Xcode). No bells & whistles.
   - No GitHub Actions, workflows, badges, issue/PR templates, bots, webhooks, Pages, or CI services.
   - No third-party CI/CD or automation; no release pipelines.
@@ -173,4 +174,6 @@ Developer Notes Log
 */
 
 public enum DeveloperNotesAnchor {}
+
+
 
