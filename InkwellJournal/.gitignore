@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# SwiftPM
+.build/
+.swiftpm/
+Packages/
+
+# CocoaPods (not used, but safe to ignore if present)
+Pods/
+
+# Carthage (not used, but safe to ignore if present)
+Carthage/Build/
+
+# Fastlane (not used, but safe to ignore if present)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# SPM artifacts
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# User-specific
+*.orig
+*.rej
+*.swp
+*.swo
+*~
