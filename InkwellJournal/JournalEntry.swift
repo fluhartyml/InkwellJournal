@@ -1,3 +1,4 @@
+//2025 SEP 28 - 1534 - JournalEntry.swift Clean Working
 import SwiftData
 import Foundation
 

@@ -1,3 +1,4 @@
+//2025 SEP 28 - 1532 - (MLF) InkwellJournalApp.swift Clean Working
 import SwiftUI
 import SwiftData
 

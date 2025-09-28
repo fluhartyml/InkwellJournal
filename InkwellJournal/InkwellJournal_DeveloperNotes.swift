@@ -1,4 +1,4 @@
-// 2025 SEP 26 - 1833 - InkwellJournal_Developer Notes (MLF)
+// 2025 SEP 28 - 1531 - InkwellJournal_DeveloperNotes.swift (MLF)
 //  InkellJournal_DeveloperNotes.swift
 //  Inkwell Journal
 //

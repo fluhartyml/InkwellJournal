@@ -1,3 +1,4 @@
+//2025 SEP 28 1529 Clean Workking ContentView.swift
 import SwiftUI
 import SwiftData
 
