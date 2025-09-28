@@ -13,56 +13,38 @@ import UIKit
 import AVFoundation
 import Foundation
 
-// MARK: - SwiftData Model
 
-@Model
-final class JournalEntry {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var content: String
-    var date: Date
-    var mood: String
-    var createdAt: Date
-    var modifiedAt: Date
-    var imageData: Data?   // Optional image blob (syncs via CloudKit private DB)
 
-    init(
-        id: UUID = UUID(),
-        title: String,
-        content: String,
-        date: Date = Date(),
-        mood: String,
-        imageData: Data? = nil,
-        createdAt: Date = Date(),
-        modifiedAt: Date = Date()
-    ) {
-        self.id = id
-        self.title = title
-        self.content = content
-        self.date = date
-        self.mood = mood
-        self.imageData = imageData
-        self.createdAt = createdAt
-        self.modifiedAt = modifiedAt
-    }
 
-    var formattedDate: String {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        return f.string(from: date)
-    }
 
-    var image: UIImage? {
-        guard let imageData else { return nil }
-        return UIImage(data: imageData)
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // MARK: - Root Content
 
 struct ContentView_iOS: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \JournalEntry.date, order: .reverse) private var entries: [JournalEntry]
+    @Query(sort: \JournalEntry.dateCreated, order: .reverse) private var entries: [JournalEntry]
 
     @State private var showingNewEntry = false
     @State private var selectedEntry: JournalEntry?
@@ -165,7 +147,7 @@ struct EntryRowView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                        if entry.modifiedAt != entry.createdAt {
+                        if entry.modifiedAt != entry.dateCreated {
                             Text("Modified")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
@@ -231,7 +213,7 @@ struct EntryDetailView: View {
                                     .font(.caption)
                                     .foregroundColor(.secondary)
 
-                                if entry.modifiedAt != entry.createdAt {
+                                if entry.modifiedAt != entry.dateCreated {
                                     Text("Modified \(entry.modifiedAt, style: .relative) ago")
                                         .font(.caption2)
                                         .foregroundColor(.secondary)
