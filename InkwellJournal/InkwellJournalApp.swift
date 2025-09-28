@@ -3,41 +3,40 @@ import SwiftData
 
 @main
 struct InkwellJournalApp: App {
-    let container: ModelContainer
+    let container: ModelContainer?
 
     init() {
+        // CloudKit-compatible SwiftData setup with default values
         do {
-            // Create schema with proper versioning
-            let schema = Schema([JournalEntry.self])
-            
-            // First try local configuration to avoid CloudKit issues during development
-            let localConfig = ModelConfiguration(
-                "JournalEntries",
-                schema: schema
-            )
-            
-            self.container = try ModelContainer(for: schema, configurations: [localConfig])
-            print("✅ SwiftData: Successfully initialized local container")
-            
+            self.container = try ModelContainer(for: JournalEntry.self)
+            print("✅ SwiftData: CloudKit-compatible container initialized")
         } catch {
-            print("❌ SwiftData initialization error: \(error)")
-            
-            // Last resort: in-memory container
-            do {
-                let schema = Schema([JournalEntry.self])
-                let memoryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                self.container = try ModelContainer(for: schema, configurations: [memoryConfig])
-                print("⚠️ SwiftData: Using in-memory storage as fallback")
-            } catch {
-                fatalError("Failed to create SwiftData container: \(error)")
-            }
+            print("❌ SwiftData failed: \(error)")
+            self.container = nil
         }
     }
     
     var body: some Scene {
         WindowGroup {
-            ContentView_iOS()
-                .modelContainer(container)
+            if let container = container {
+                ContentView_iOS()
+                    .modelContainer(container)
+            } else {
+                VStack(spacing: 20) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 64))
+                        .foregroundColor(.orange)
+                    Text("Storage Unavailable")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    Text("Please restart the app. If the problem persists, check device storage.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+                .padding()
+            }
         }
     }
 }

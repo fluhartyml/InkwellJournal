@@ -16,11 +16,9 @@ struct ContentView_iOS: View {
                         Image(systemName: "book.closed")
                             .font(.system(size: 64))
                             .foregroundColor(.gray)
-
                         Text("Start Your Journal")
                             .font(.title2)
                             .fontWeight(.semibold)
-
                         Text("Tap the + button to create your first entry")
                             .font(.body)
                             .foregroundColor(.secondary)
@@ -59,7 +57,7 @@ struct ContentView_iOS: View {
             }
         }
     }
-
+    
     private func delete(at offsets: IndexSet) {
         for index in offsets {
             let entry = entries[index]
@@ -72,7 +70,7 @@ struct ContentView_iOS: View {
 // MARK: - Row
 struct EntryRowView: View {
     let entry: JournalEntry
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -82,17 +80,24 @@ struct EntryRowView: View {
                     .padding(.vertical, 4)
                     .background(Color.blue.opacity(0.2))
                     .cornerRadius(8)
-
                 Spacer()
-
                 Text(entry.formattedDate)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-
+            
+            // Show photo preview if available
+            if let image = entry.image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 120)
+                    .clipped()
+                    .cornerRadius(8)
+            }
+            
             Text(entry.title)
                 .font(.headline)
-
             Text(entry.content)
                 .font(.body)
                 .lineLimit(3)
@@ -111,9 +116,13 @@ struct EntryDetailView: View {
     @State private var editTitle = ""
     @State private var editContent = ""
     @State private var editMood = ""
-
-    let moods = ["Happy", "Sad", "Excited", "Calm", "Grateful", "Neutral"]
-
+    @State private var editImage: UIImage?
+    @State private var showingPhotoOptions = false
+    @State private var showingImagePicker = false
+    @State private var imagePickerSource: ImagePicker.SourceType = .photoLibrary
+    
+    let moods = ["Happy", "Sad", "Excited", "Calm", "Grateful", "Neutral", "Angry"]
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -126,21 +135,51 @@ struct EntryDetailView: View {
                                 .padding(.vertical, 6)
                                 .background(Color.blue.opacity(0.2))
                                 .cornerRadius(12)
-
                             Spacer()
-
                             Text(entry.formattedDate)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
-
+                        
+                        // Photo section
+                        if isEditing {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Photo").font(.headline)
+                                
+                                if let image = editImage {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(height: 200)
+                                        .clipped()
+                                        .cornerRadius(12)
+                                }
+                                
+                                Button(action: { showingPhotoOptions = true }) {
+                                    HStack {
+                                        Image(systemName: editImage == nil ? "camera.fill" : "camera.badge.ellipsis")
+                                        Text(editImage == nil ? "Add Photo" : "Change Photo")
+                                    }
+                                    .font(.body)
+                                    .foregroundColor(.blue)
+                                    .padding(.vertical, 8)
+                                }
+                            }
+                        } else if let image = entry.image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(maxHeight: 300)
+                                .clipped()
+                                .cornerRadius(12)
+                        }
+                        
                         if isEditing {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Title").font(.headline)
                                 TextField("Enter a title...", text: $editTitle)
                                     .textFieldStyle(.roundedBorder)
                             }
-
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Mood").font(.headline)
                                 Picker("Mood", selection: $editMood) {
@@ -148,7 +187,6 @@ struct EntryDetailView: View {
                                 }
                                 .pickerStyle(.segmented)
                             }
-
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Your thoughts").font(.headline)
                                 TextEditor(text: $editContent)
@@ -162,7 +200,6 @@ struct EntryDetailView: View {
                             Text(entry.title)
                                 .font(.title2)
                                 .fontWeight(.semibold)
-
                             Text(entry.content)
                                 .font(.body)
                                 .lineSpacing(4)
@@ -197,27 +234,41 @@ struct EntryDetailView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingPhotoOptions) {
+                PhotoActionSheet(
+                    showingImagePicker: $showingImagePicker,
+                    imagePickerSource: $imagePickerSource,
+                    selectedImage: $editImage
+                )
+                .presentationDetents([.height(200)])
+            }
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker(sourceType: imagePickerSource, selectedImage: $editImage)
+            }
         }
         .onAppear { resetEditFields() }
     }
-
+    
     private func startEditing() {
         editTitle = entry.title
         editContent = entry.content
         editMood = entry.mood
+        editImage = entry.image
         isEditing = true
     }
-
+    
     private func resetEditFields() {
         editTitle = entry.title
         editContent = entry.content
         editMood = entry.mood
+        editImage = entry.image
     }
-
+    
     private func saveChanges() {
         entry.title = editTitle
         entry.content = editContent
         entry.mood = editMood
+        entry.imageData = editImage?.jpegData(compressionQuality: 0.8)
         try? modelContext.save()
     }
 }
@@ -226,23 +277,49 @@ struct EntryDetailView: View {
 struct NewEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-
     @State private var title = ""
     @State private var content = ""
     @State private var mood = "Happy"
-
-    let moods = ["Happy", "Sad", "Excited", "Calm", "Grateful", "Neutral"]
-
+    @State private var selectedImage: UIImage?
+    @State private var showingPhotoOptions = false
+    @State private var showingImagePicker = false
+    @State private var imagePickerSource: ImagePicker.SourceType = .photoLibrary
+    
+    let moods = ["Happy", "Sad", "Excited", "Calm", "Grateful", "Neutral", "Angry"]
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
+                        Text("Photo (Optional)").font(.headline)
+                        
+                        if let image = selectedImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 200)
+                                .clipped()
+                                .cornerRadius(12)
+                        }
+                        
+                        Button(action: { showingPhotoOptions = true }) {
+                            HStack {
+                                Image(systemName: selectedImage == nil ? "camera.fill" : "camera.badge.ellipsis")
+                                Text(selectedImage == nil ? "Add Photo" : "Change Photo")
+                            }
+                            .font(.body)
+                            .foregroundColor(.blue)
+                            .padding(.vertical, 8)
+                        }
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Title").font(.headline)
                         TextField("Enter a title...", text: $title)
                             .textFieldStyle(.roundedBorder)
                     }
-
+                    
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Mood").font(.headline)
                         Picker("Mood", selection: $mood) {
@@ -250,7 +327,7 @@ struct NewEntryView: View {
                         }
                         .pickerStyle(.segmented)
                     }
-
+                    
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Your thoughts").font(.headline)
                         TextEditor(text: $content)
@@ -274,7 +351,8 @@ struct NewEntryView: View {
                         let entry = JournalEntry(
                             title: title,
                             content: content,
-                            mood: mood
+                            mood: mood,
+                            imageData: selectedImage?.jpegData(compressionQuality: 0.8)
                         )
                         modelContext.insert(entry)
                         try? modelContext.save()
@@ -282,6 +360,17 @@ struct NewEntryView: View {
                     }
                     .disabled(title.isEmpty)
                 }
+            }
+            .sheet(isPresented: $showingPhotoOptions) {
+                PhotoActionSheet(
+                    showingImagePicker: $showingImagePicker,
+                    imagePickerSource: $imagePickerSource,
+                    selectedImage: $selectedImage
+                )
+                .presentationDetents([.height(200)])
+            }
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker(sourceType: imagePickerSource, selectedImage: $selectedImage)
             }
         }
     }
