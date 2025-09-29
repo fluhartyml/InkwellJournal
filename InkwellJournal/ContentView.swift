@@ -12,52 +12,58 @@ struct ContentView_iOS: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if entries.isEmpty {
-                    VStack(spacing: 20) {
-                        Image(systemName: "book.closed")
-                            .font(.system(size: 64))
-                            .foregroundColor(.gray)
+            if entries.isEmpty {
+                VStack(spacing: 20) {
+                    Spacer()
+                    
+                    Image(systemName: "book.closed")
+                        .font(.system(size: 64))
+                        .foregroundColor(.gray)
 
-                        Text("Start Your Journal")
-                            .font(.title2)
-                            .fontWeight(.semibold)
+                    Text("Start Your Journal")
+                        .font(.title2)
+                        .fontWeight(.semibold)
 
-                        Text("Tap the + button to create your first entry")
-                            .font(.body)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
+                    Text("Tap the + button to create your first entry")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(entries) { entry in
+                        EntryRowView(entry: entry)
+                            .onTapGesture { selectedEntry = entry }
                     }
-                    .padding()
-                } else {
-                    List {
-                        ForEach(entries) { entry in
-                            EntryRowView(entry: entry)
-                                .onTapGesture { selectedEntry = entry }
-                        }
-                        .onDelete(perform: delete)
-                    }
+                    .onDelete(perform: delete)
+                }
+                .listStyle(.plain)
+            }
+        }
+        .navigationTitle("My Journal")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { showingNewEntry = true }) {
+                    Image(systemName: "plus")
+                        .font(.title2)
                 }
             }
-            .navigationTitle("My Journal")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingNewEntry = true }) {
-                        Image(systemName: "plus")
-                            .font(.title2)
-                    }
-                }
-            }
-            .fullScreenCover(isPresented: $showingNewEntry) {
-                NewEntryView()
-            }
-            .sheet(isPresented: Binding(
-                get: { selectedEntry != nil },
-                set: { if !$0 { selectedEntry = nil } }
-            )) {
-                if let entry = selectedEntry {
-                    EntryDetailView(entry: entry)
-                }
+        }
+        .fullScreenCover(isPresented: $showingNewEntry) {
+            NewEntryView()
+        }
+        .sheet(isPresented: Binding(
+            get: { selectedEntry != nil },
+            set: { if !$0 { selectedEntry = nil } }
+        )) {
+            if let entry = selectedEntry {
+                EntryDetailView(entry: entry)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
@@ -133,8 +139,8 @@ struct EntryDetailView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 0) {
                         HStack {
                             Text(isEditing ? editMood : entry.mood)
                                 .font(.caption)
@@ -151,13 +157,13 @@ struct EntryDetailView: View {
                         }
 
                         if isEditing {
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 0) {
                                 Text("Title").font(.headline)
                                 TextField("Enter a title...", text: $editTitle)
                                     .textFieldStyle(.roundedBorder)
                             }
 
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 0) {
                                 Text("Mood").font(.headline)
                                 Picker("Mood", selection: $editMood) {
                                     ForEach(moods, id: \.self) { Text($0).tag($0) }
@@ -226,12 +232,12 @@ struct EntryDetailView: View {
 
                             Text(entry.content)
                                 .font(.body)
-                                .lineSpacing(4)
+                                .lineSpacing(0)
                         }
                     }
                 }
-                .padding()
             }
+            .clipped()
             .navigationTitle("Journal Entry")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
