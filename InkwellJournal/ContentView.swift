@@ -12,58 +12,61 @@ struct ContentView_iOS: View {
 
     var body: some View {
         NavigationStack {
-            if entries.isEmpty {
-                VStack(spacing: 20) {
-                    Spacer()
-                    
-                    Image(systemName: "book.closed")
-                        .font(.system(size: 64))
-                        .foregroundColor(.gray)
+            Group {
+                if entries.isEmpty {
+                    VStack(spacing: 20) {
+                        Spacer()
 
-                    Text("Start Your Journal")
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                        Image(systemName: "book.closed")
+                            .font(.system(size: 64))
+                            .foregroundColor(.gray)
 
-                    Text("Tap the + button to create your first entry")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                    
-                    Spacer()
-                }
-                .padding()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    ForEach(entries) { entry in
-                        EntryRowView(entry: entry)
-                            .onTapGesture { selectedEntry = entry }
+                        Text("Start Your Journal")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        Text("Tap the + button to create your first entry")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+
+                        Spacer()
                     }
-                    .onDelete(perform: delete)
+                    .padding(.horizontal)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List {
+                        ForEach(entries) { entry in
+                            EntryRowView(entry: entry)
+                                .onTapGesture { selectedEntry = entry }
+                        }
+                        .onDelete(perform: delete)
+                    }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
             }
-        }
-        .navigationTitle("My Journal")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showingNewEntry = true }) {
-                    Image(systemName: "plus")
-                        .font(.title2)
+            .navigationTitle("My Journal")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showingNewEntry = true }) {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                    }
                 }
             }
         }
         .fullScreenCover(isPresented: $showingNewEntry) {
             NewEntryView()
         }
-        .sheet(isPresented: Binding(
+        .fullScreenCover(isPresented: Binding(
             get: { selectedEntry != nil },
             set: { if !$0 { selectedEntry = nil } }
         )) {
             if let entry = selectedEntry {
                 EntryDetailView(entry: entry)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
             }
         }
     }
@@ -240,6 +243,8 @@ struct EntryDetailView: View {
             .clipped()
             .navigationTitle("Journal Entry")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if isEditing {
@@ -337,63 +342,52 @@ struct NewEntryView: View {
     @State private var cameraDevice: UIImagePickerController.CameraDevice = .rear
     @State private var showingDocumentScanner = false
 
+    @FocusState private var focusedField: Field?
+    private enum Field { case title, content }
+
     let moods = ["Happy", "Sad", "Excited", "Calm", "Grateful", "Neutral"]
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Title").font(.headline)
-                        TextField("Enter a title...", text: $title)
-                            .textFieldStyle(.roundedBorder)
-                    }
+            Form {
+                Section("Title") {
+                    TextField("Enter a title...", text: $title)
+                        .textInputAutocapitalization(.sentences)
+                        .disableAutocorrection(false)
+                        .focused($focusedField, equals: .title)
+                }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Mood").font(.headline)
-                        Picker("Mood", selection: $mood) {
-                            ForEach(moods, id: \.self) { Text($0).tag($0) }
-                        }
-                        .pickerStyle(.segmented)
+                Section("Mood") {
+                    Picker("Mood", selection: $mood) {
+                        ForEach(moods, id: \.self) { Text($0).tag($0) }
                     }
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Photo").font(.headline)
-                        if let selectedImage = selectedImage {
-                            Image(uiImage: selectedImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxHeight: 200)
-                                .cornerRadius(8)
-                        }
-                        Button(action: { showingCameraOptions = true }) {
-                            HStack {
-                                Image(systemName: "camera")
-                                Text(selectedImage == nil ? "Add Photo" : "Change Photo")
-                            }
-                            .foregroundColor(.blue)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.blue, lineWidth: 1)
-                            )
-                        }
-                    }
+                    .pickerStyle(.segmented)
+                }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Your thoughts").font(.headline)
-                        TextEditor(text: $content)
-                            .frame(minHeight: 200)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
+                Section("Photo") {
+                    if let selectedImage = selectedImage {
+                        Image(uiImage: selectedImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 220)
+                            .cornerRadius(8)
+                    }
+                    Button(action: { showingCameraOptions = true }) {
+                        Label(selectedImage == nil ? "Add Photo" : "Change Photo", systemImage: "camera")
                     }
                 }
-                .padding()
+
+                Section("Your thoughts") {
+                    TextEditor(text: $content)
+                        .frame(minHeight: 180)
+                        .focused($focusedField, equals: .content)
+                }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("New Entry")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") { dismiss() }
@@ -413,8 +407,13 @@ struct NewEntryView: View {
                     }
                     .disabled(title.isEmpty)
                 }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { focusedField = nil }
+                }
             }
         }
+        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
         .confirmationDialog("Add Photo", isPresented: $showingCameraOptions) {
             Button("Selfie") {
                 cameraSourceType = .camera
@@ -544,3 +543,27 @@ struct DocumentScanner: UIViewControllerRepresentable {
         }
     }
 }
+
+// MARK: - Launch Logo Preview (temporary)
+struct LaunchLogoPreviewView: View {
+    var body: some View {
+        ZStack {
+            Color(.systemBackground).ignoresSafeArea()
+            Image("LaunchLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 220, height: 220)
+                .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 8)
+        }
+    }
+}
+
+#Preview("Launch Logo — Light") {
+    LaunchLogoPreviewView()
+}
+
+#Preview("Launch Logo — Dark") {
+    LaunchLogoPreviewView()
+        .environment(\.colorScheme, .dark)
+}
+
