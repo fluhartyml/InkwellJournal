@@ -37,8 +37,9 @@ struct ContentView_iOS: View {
                 } else {
                     List {
                         ForEach(entries) { entry in
-                            EntryRowView(entry: entry)
-                                .onTapGesture { selectedEntry = entry }
+                            NavigationLink(value: entry) {
+                                EntryRowView(entry: entry)
+                            }
                         }
                         .onDelete(perform: delete)
                     }
@@ -57,17 +58,12 @@ struct ContentView_iOS: View {
                     }
                 }
             }
+            .navigationDestination(for: JournalEntry.self) { entry in
+                EntryDetailView(entry: entry)
+            }
         }
         .fullScreenCover(isPresented: $showingNewEntry) {
             NewEntryView()
-        }
-        .fullScreenCover(isPresented: Binding(
-            get: { selectedEntry != nil },
-            set: { if !$0 { selectedEntry = nil } }
-        )) {
-            if let entry = selectedEntry {
-                EntryDetailView(entry: entry)
-            }
         }
     }
 
@@ -140,133 +136,135 @@ struct EntryDetailView: View {
     let moods = ["Happy", "Sad", "Excited", "Calm", "Grateful", "Neutral"]
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        HStack {
-                            Text(isEditing ? editMood : entry.mood)
-                                .font(.caption)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.blue.opacity(0.2))
-                                .cornerRadius(12)
+                    // --- Mood and Date Row with smaller font and tighter padding ---
+                    HStack {
+                        Text(isEditing ? editMood : entry.mood)
+                            .font(.caption2)                           // Changed from caption to caption2
+                            .padding(.horizontal, 8)                   // Reduced horizontal padding
+                            .padding(.vertical, 3)                     // Reduced vertical padding
+                            .background(Color.blue.opacity(0.2))
+                            .cornerRadius(8)                           // Reduced corner radius
 
-                            Spacer()
+                        Spacer()
 
-                            Text(entry.formattedDate)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                        Text(entry.formattedDate)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.bottom, 12)                           // Added spacing below mood/date row
+
+                    if isEditing {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("Title").font(.headline)
+                            TextField("Enter a title...", text: $editTitle)
+                                .textFieldStyle(.roundedBorder)
                         }
 
-                        if isEditing {
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text("Title").font(.headline)
-                                TextField("Enter a title...", text: $editTitle)
-                                    .textFieldStyle(.roundedBorder)
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("Mood").font(.headline)
+                            Picker("Mood", selection: $editMood) {
+                                ForEach(moods, id: \.self) { Text($0).tag($0) }
                             }
-
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text("Mood").font(.headline)
-                                Picker("Mood", selection: $editMood) {
-                                    ForEach(moods, id: \.self) { Text($0).tag($0) }
-                                }
-                                .pickerStyle(.segmented)
+                            .pickerStyle(.segmented)
+                        }
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Photo").font(.headline)
+                            if let editImage = editImage {
+                                Image(uiImage: editImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxHeight: 200)
+                                    .cornerRadius(8)
                             }
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Photo").font(.headline)
-                                if let editImage = editImage {
-                                    Image(uiImage: editImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(maxHeight: 200)
-                                        .cornerRadius(8)
+                            Button(action: { showingCameraOptions = true }) {
+                                HStack {
+                                    Image(systemName: "camera")
+                                    Text(editImage == nil ? "Add Photo" : "Change Photo")
                                 }
-                                Button(action: { showingCameraOptions = true }) {
+                                .foregroundColor(.blue)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.blue, lineWidth: 1)
+                                )
+                            }
+                            if editImage != nil {
+                                Button(action: { editImage = nil }) {
                                     HStack {
-                                        Image(systemName: "camera")
-                                        Text(editImage == nil ? "Add Photo" : "Change Photo")
+                                        Image(systemName: "trash")
+                                        Text("Remove Photo")
                                     }
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.red)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.blue, lineWidth: 1)
+                                            .stroke(Color.red, lineWidth: 1)
                                     )
                                 }
-                                if editImage != nil {
-                                    Button(action: { editImage = nil }) {
-                                        HStack {
-                                            Image(systemName: "trash")
-                                            Text("Remove Photo")
-                                        }
-                                        .foregroundColor(.red)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 12)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.red, lineWidth: 1)
-                                        )
-                                    }
-                                }
                             }
-
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Your thoughts").font(.headline)
-                                TextEditor(text: $editContent)
-                                    .frame(minHeight: 200)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                    )
-                            }
-                        } else {
-                            Text(entry.title)
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            if let image = entry.image {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxHeight: 300)
-                                    .cornerRadius(8)
-                            }
-
-                            Text(entry.content)
-                                .font(.body)
-                                .lineSpacing(0)
                         }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Your thoughts").font(.headline)
+                            TextEditor(text: $editContent)
+                                .frame(minHeight: 200)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                    } else {
+                        // --- Non-editing Title with adjusted font and padding ---
+                        Text(entry.title)
+                            .font(.title3)                                  // Changed from title2 to title3
+                            .fontWeight(.medium)                            // Changed from semibold to medium
+                            .padding(.top, 8)                               // Added top padding for separation
+
+                        if let image = entry.image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxHeight: 300)
+                                .cornerRadius(8)
+                        }
+
+                        Text(entry.content)
+                            .font(.body)
+                            .lineSpacing(0)
+                            .padding(.top, 8)                               // Added some spacing below title/image to content
                     }
                 }
             }
-            .clipped()
-            .navigationTitle("Journal Entry")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if isEditing {
-                        Button("Cancel") {
-                            isEditing = false
-                            resetEditFields()
-                        }
+        }
+        .clipped()
+        .navigationTitle("Journal Entry")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                if isEditing {
+                    Button("Cancel") {
+                        isEditing = false
+                        resetEditFields()
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if isEditing {
-                        Button("Save") {
-                            saveChanges()
-                            isEditing = false
-                        }
-                        .disabled(editTitle.isEmpty)
-                    } else {
-                        HStack {
-                            Button("Edit") { startEditing() }
-                            Button("Done") { dismiss() }
-                        }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if isEditing {
+                    Button("Save") {
+                        saveChanges()
+                        isEditing = false
                     }
+                    .disabled(editTitle.isEmpty)
+                } else {
+                    // --- Show only Edit button when not editing ---
+                    Button("Edit") { startEditing() }
                 }
             }
         }
