@@ -20,7 +20,7 @@ struct InkwellJournalApp: App {
     var body: some Scene {
         WindowGroup {
             if let container = container {
-                ContentView_iOS()
+                ContentView()
                     .modelContainer(container)
             } else {
                 VStack(spacing: 20) {
@@ -41,3 +41,4 @@ struct InkwellJournalApp: App {
         }
     }
 }
+
