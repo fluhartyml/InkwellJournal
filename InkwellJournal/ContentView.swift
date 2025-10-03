@@ -37,6 +37,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(backgroundShade: $backgroundShade, fontScale: $fontScale, fontColorShade: $fontColorShade)
+                .interactiveDismissDisabled()
         }
     }
 
