@@ -8,66 +8,57 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Slider(value: $fontScale, in: 0.6...4.0)
-                    .padding()
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [.white, .black]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+            ZStack {
+                Color(white: 1 - backgroundShade)
+                    .ignoresSafeArea()
+                VStack {
+                    Slider(value: $fontScale, in: 0.6...4.0)
+                        .padding()
+                        .background(
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [.white, .black]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                            )
-                    )
-                    .cornerRadius(10)
-                    .padding(.horizontal)
+                        )
+                        .cornerRadius(10)
+                        .padding(.horizontal)
 
-                Slider(value: $fontColorShade, in: 0...1)
-                    .padding()
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [.black, .white]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+                    Slider(value: $fontColorShade, in: 0...1)
+                        .padding()
+                        .background(
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [.black, .white]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                            )
-                    )
-                    .cornerRadius(10)
-                    .padding(.horizontal)
+                        )
+                        .cornerRadius(10)
+                        .padding(.horizontal)
 
-                Slider(value: $backgroundShade, in: 0...1)
-                    .padding()
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [.white, .black]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+                    Slider(value: $backgroundShade, in: 0...1)
+                        .padding()
+                        .background(
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [.white, .black]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                            )
-                    )
-                    .cornerRadius(10)
-                    .padding(.horizontal)
+                        )
+                        .cornerRadius(10)
+                        .padding(.horizontal)
 
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(white: 1 - backgroundShade))
-                    .frame(width: 150, height: max(48, fontScale * 64))
-                    .overlay(
-                        Text(Date.now, format: .dateTime.hour().minute())
-                            .font(.system(size: 40 * fontScale, weight: .thin, design: .monospaced))
-                            .foregroundColor(Color(white: fontColorShade))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                            .minimumScaleFactor(0.5)
-                            .lineLimit(1)
-                    )
-                    .padding(.top)
-
-                Spacer()
+                    Spacer()
+                }
             }
             .navigationTitle("Settings")
             .toolbar {
