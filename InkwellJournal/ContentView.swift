@@ -9,20 +9,22 @@ struct ContentView: View {
     let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack {
-            Text(timeString)
-                .font(.system(size: 80, weight: .thin, design: .monospaced))
-                .onReceive(timer) { _ in
-                    currentTime = Date()
-                    showColon.toggle()
-                }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showingSettings = true
-                } label: {
-                    Image(systemName: "gearshape")
+        NavigationStack {
+            VStack {
+                Text(timeString)
+                    .font(.system(size: 80, weight: .thin, design: .monospaced))
+                    .onReceive(timer) { _ in
+                        currentTime = Date()
+                        showColon.toggle()
+                    }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
                 }
             }
         }
