@@ -4,29 +4,12 @@ struct SettingsView: View {
     @Binding var backgroundShade: Double
     @Binding var fontScale: Double
     @Binding var fontColorShade: Double
-    @State private var fontMultiplier: Double = 2.0
     @Environment(\.dismiss) var dismiss
-
-    var fontMultiplierOptions: [Double] = [1.0, 2.0, 4.0, 8.0]
 
     var body: some View {
         NavigationStack {
             VStack {
-                Picker("Font Size Multiplier", selection: $fontMultiplier) {
-                    Text("1x").tag(1.0)
-                    Text("2x").tag(2.0)
-                    Text("4x").tag(4.0)
-                    Text("8x").tag(8.0)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .onChange(of: fontMultiplier) { newValue in
-                    if fontScale > newValue {
-                        fontScale = newValue
-                    }
-                }
-
-                Slider(value: $fontScale, in: 0.6...fontMultiplier)
+                Slider(value: $fontScale, in: 0.6...4.0)
                     .padding()
                     .background(
                         Capsule()
@@ -88,6 +71,13 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Restore Defaults") {
+                        backgroundShade = 0.5
+                        fontScale = 1.0
+                        fontColorShade = 0.0
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         dismiss()
